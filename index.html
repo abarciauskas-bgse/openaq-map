@@ -21,11 +21,12 @@
 
   <style>
     #mapid {
-      height: 700px;
+      height: 600px;
+      width: 1000px;
     }
 
     path {
-      transition: fill 1s;
+      transition: fill-opacity 1s;
     }
   </style>
 </head>
@@ -36,8 +37,8 @@
 
 <footer>
   <script type="text/javascript">
-    const mymap = L.map('mapid').setView([51.505, -0.09], 10);
-    const accessToken = 'ADDME';
+    const mymap = L.map('mapid').setView([25, 0], 2);
+    const accessToken = '';
 
     L.tileLayer(
       `https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=${accessToken}`,
@@ -65,28 +66,30 @@
 
       $.getJSON(`data/generated/${currentDateString}.json`, function(json) {
         const circles = json.map((location) => {
-          return L.circle([location.latitude, location.longitude], {
+          const circle = L.circle([location.latitude, location.longitude], {
             color: d3.interpolateRdYlGn(1 - location.average/100),
-            fillColor: null,//d3.interpolateRdYlGn(1 - location.average/100),
-            //fillOpacity: 0,
-            opacity: 1,
+            fillColor: d3.interpolateRdYlGn(1 - location.average/100),
+            opacity: 0,
+            fillOpacity: 0,
             radius: 1000
           });
+          circle.aqAverage = location.average;
+          return circle;
         });
         circleGroup = L.layerGroup(circles);
         mymap.addLayer(circleGroup);
-        function updateColors() {
+        function updateColors(opacity = 1) {
           circleGroup.eachLayer((layer) => {
-            layer.setStyle({fillColor: d3.interpolateRdYlGn(1 - 50/100)});
+            layer.setStyle({fillOpacity: opacity});
           });
         }
         setTimeout(updateColors, 500);
+        setTimeout(updateColors.bind(null, 0), 1500);
       });
       currentDate = currentDate.add(1, 'days');
-      //setTimeout(updateMap, 3000);
+      setTimeout(updateMap, 2500);
     }
     updateMap();
-    //setInterval(updateMap, 1000);
   </script>
 </footer>
 </html>
