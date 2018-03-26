@@ -26,7 +26,7 @@
     }
 
     path {
-      transition: fill-opacity 1s;
+      transition: fill-opacity 0.5s;
     }
   </style>
 </head>
@@ -37,8 +37,8 @@
 
 <footer>
   <script type="text/javascript">
-    const mymap = L.map('mapid').setView([25, 0], 2);
-    const accessToken = '';
+    const mymap = L.map('mapid').setView([51, 0], 5);
+    const accessToken = 'pk.eyJ1IjoiYWltZWViIiwiYSI6ImNqZjVwNXMwNzExY3gycW44dGdyenFxaGoifQ.jd1Kgk4V2276G97KKcXZBA';
 
     L.tileLayer(
       `https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=${accessToken}`,
@@ -58,10 +58,18 @@
     let currentDate = startDate;
     const endDate = moment(endDateString, dateFormat);
 
+    function updateColors(currentCircleGroup, opacity = 1) {
+      currentCircleGroup.eachLayer((layer) => {
+        layer.setStyle({fillOpacity: opacity});
+      });
+    }
+
     let circleGroup = L.layerGroup();
 
     function updateMap() {
-      mymap.removeLayer(circleGroup);
+      // fade out current circles
+      setTimeout(updateColors.bind(null, circleGroup, 0), 400);
+      // remove current circles
       currentDateString = currentDate.format(dateFormat);
 
       $.getJSON(`data/generated/${currentDateString}.json`, function(json) {
@@ -71,23 +79,18 @@
             fillColor: d3.interpolateRdYlGn(1 - location.average/100),
             opacity: 0,
             fillOpacity: 0,
-            radius: 1000
+            radius: 10000
           });
           circle.aqAverage = location.average;
           return circle;
         });
         circleGroup = L.layerGroup(circles);
         mymap.addLayer(circleGroup);
-        function updateColors(opacity = 1) {
-          circleGroup.eachLayer((layer) => {
-            layer.setStyle({fillOpacity: opacity});
-          });
-        }
-        setTimeout(updateColors, 500);
-        setTimeout(updateColors.bind(null, 0), 1500);
+
+        setTimeout(updateColors.bind(null, circleGroup), 500);
       });
       currentDate = currentDate.add(1, 'days');
-      setTimeout(updateMap, 2500);
+      setTimeout(updateMap, 1800);
     }
     updateMap();
   </script>
