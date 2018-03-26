@@ -26,7 +26,7 @@
     }
 
     path {
-      transition: fill-opacity 0.5s;
+      transition: fill-opacity 1s;
     }
   </style>
 </head>
@@ -68,8 +68,8 @@
 
     function updateMap() {
       // fade out current circles
-      setTimeout(updateColors.bind(null, circleGroup, 0), 400);
-      // remove current circles
+      setTimeout(updateColors.bind(null, circleGroup, 0), 200);
+      // TODO(aimee): remove current circles
       currentDateString = currentDate.format(dateFormat);
 
       $.getJSON(`data/generated/${currentDateString}.json`, function(json) {
